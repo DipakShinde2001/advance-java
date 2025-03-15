@@ -1,0 +1,30 @@
+Java Program (JDBC + ResultSetMetaData)
+import java.sql.*;
+public class DonarTableMetadata {
+ public static void main(String[] args) {
+ // Database connection details
+ String url = "jdbc:mysql://localhost:3306/your_database"; // Change DB name
+ String user = "your_username"; // Change username
+ String password = "your_password"; // Change password
+ String query = "SELECT * FROM DONAR"; // Query to fetch metadata
+ try (Connection conn = DriverManager.getConnection(url, user, password);
+ PreparedStatement pstmt = conn.prepareStatement(query);
+ ResultSet rs = pstmt.executeQuery()) {
+ // Get ResultSetMetaData
+ ResultSetMetaData rsmd = rs.getMetaData();
+ int columnCount = rsmd.getColumnCount();
+ // Display column details
+ System.out.println("DONAR Table Column Details:");
+ System.out.println("--------------------------------------");
+ for (int i = 1; i <= columnCount; i++) {
+ System.out.println("Column " + i + ":");
+ System.out.println(" Name : " + rsmd.getColumnName(i));
+ System.out.println(" Type : " + rsmd.getColumnTypeName(i));
+ System.out.println(" Size : " + rsmd.getColumnDisplaySize(i));
+ System.out.println("--------------------------------------");
+ }
+ } catch (SQLException e) {
+ e.printStackTrace();
+ }
+ }
+}
