@@ -1,0 +1,108 @@
+OnlineBookStoreServlet.java
+package com.example;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+@WebServlet("/OnlineBookStoreServlet")
+public class OnlineBookStoreServlet extends HttpServlet {
+ protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
+ServletException, IOException {
+ HttpSession session = request.getSession();
+ // Step 1: User Login
+ if (request.getParameter("login") != null) {
+ String username = request.getParameter("username");
+ String password = request.getParameter("password");
+ if ("admin".equals(username) && "password".equals(password)) {
+ session.setAttribute("username", username);
+ session.setAttribute("cartTotal", 0);
+ session.setAttribute("bookCount", 0);
+ showBookSelectionPage(response, username);
+ } else {
+ response.sendRedirect("index.html?error=Invalid Login");
+ }
+ return;
+ }
+ // Step 2: Book Selection
+ if (request.getParameter("buyBooks") != null) {
+ int book1Price = 500, book2Price = 700, book3Price = 900;
+ int cartTotal = (int) session.getAttribute("cartTotal");
+ int bookCount = (int) session.getAttribute("bookCount");
+ if (request.getParameter("book1") != null) {
+ cartTotal += book1Price;
+ bookCount++;
+ }
+ if (request.getParameter("book2") != null) {
+ cartTotal += book2Price;
+ bookCount++;
+ }
+ if (request.getParameter("book3") != null) {
+ cartTotal += book3Price;
+ bookCount++;
+ }
+ session.setAttribute("cartTotal", cartTotal);
+ session.setAttribute("bookCount", bookCount);
+ showCheckoutPage(response, bookCount, cartTotal);
+ return;
+ }
+ // Step 3: Checkout & Logout
+ if (request.getParameter("checkout") != null) {
+ session.invalidate();
+ response.sendRedirect("index.html?msg=Thank You! Your order is confirmed.");
+ }
+ }
+ // Displays the book selection page
+ private void showBookSelectionPage(HttpServletResponse response, String username) throws
+IOException {
+ PrintWriter out = response.getWriter();
+ response.setContentType("text/html");
+ out.println("<html><head><title>Select Books</title></head><body>");
+ out.println("<h2>Welcome, " + username + "</h2>");
+ out.println("<form action='OnlineBookStoreServlet' method='post'>");
+ out.println("<input type='checkbox' name='book1'> Java Programming - ₹500 <br>");
+ out.println("<input type='checkbox' name='book2'> Web Development - ₹700 <br>");
+ out.println("<input type='checkbox' name='book3'> Data Structures - ₹900 <br>");
+ out.println("<input type='submit' name='buyBooks' value='Add to Cart'>");
+ out.println("</form></body></html>");
+ }
+ // Displays the checkout page
+ private void showCheckoutPage(HttpServletResponse response, int bookCount, int cartTotal)
+throws IOException {
+ PrintWriter out = response.getWriter();
+ response.setContentType("text/html");
+ out.println("<html><head><title>Checkout</title></head><body>");
+ out.println("<h2>Checkout Summary</h2>");
+ out.println("<p><b>Books Purchased:</b> " + bookCount + "</p>");
+ out.println("<p><b>Total Amount:</b> ₹" + cartTotal + "</p>");
+ out.println("<form action='OnlineBookStoreServlet' method='post'>");
+ out.println("<input type='submit' name='checkout' value='Confirm & Logout'>");
+ out.println("</form></body></html>");
+ }
+}
+index.html (Login Page)
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Login</title>
+</head>
+<body>
+ <h2>Online Book Store - Login</h2>
+ <form action="OnlineBookStoreServlet" method="post">
+ Username: <input type="text" name="username" required><br>
+ Password: <input type="password" name="password" required><br>
+ <input type="submit" name="login" value="Login">
+ </form>
+</body>
+</html>
+web.xml
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="3.1">
+ <servlet>
+ <servlet-name>OnlineBookStoreServlet</servlet-name>
+ <servlet-class>com.example.OnlineBookStoreServlet</servlet-class>
+ </servlet>
+ <servlet-mapping>
+ <servlet-name>OnlineBookStoreServlet</servlet-name>
+ <url-pattern>/OnlineBookStoreServlet</url-pattern>
+ </servlet-mapping>
+</web-app>
