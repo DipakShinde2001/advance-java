@@ -1,0 +1,93 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+public class CoWinRegistration extends JFrame {
+ private JTextField txtAadhar, txtBirthYear, txtMobile, txtHospital;
+ private JRadioButton rbAge18, rbAge45, rbCovishield, rbCovaxin, rbSputnik, rbMorning,
+rbAfternoon, rbEvening;
+ private JButton btnAdd, btnUpdate, btnDelete, btnView, btnSearch;
+ public CoWinRegistration() {
+ setTitle("Co-WIN Registration");
+ setSize(400, 400);
+ setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ setLayout(new GridLayout(10, 2));
+ // Labels and TextFields
+ add(new JLabel("Aadhar Card No.:"));
+ txtAadhar = new JTextField();
+ add(txtAadhar);
+ add(new JLabel("Birth Year:"));
+ txtBirthYear = new JTextField();
+ add(txtBirthYear);
+ add(new JLabel("Mobile No.:"));
+ txtMobile = new JTextField();
+ add(txtMobile);
+ add(new JLabel("Age Group:"));
+ JPanel agePanel = new JPanel();
+ rbAge18 = new JRadioButton("18 & above");
+ rbAge45 = new JRadioButton("45 & above");
+ ButtonGroup ageGroup = new ButtonGroup();
+ ageGroup.add(rbAge18);
+ ageGroup.add(rbAge45);
+ agePanel.add(rbAge18);
+ agePanel.add(rbAge45);
+ add(agePanel);
+ add(new JLabel("Select Hospital:"));
+ txtHospital = new JTextField();
+ add(txtHospital);
+ add(new JLabel("Vaccine:"));
+ JPanel vaccinePanel = new JPanel();
+ rbCovishield = new JRadioButton("Covishield");
+ rbCovaxin = new JRadioButton("Covaxin");
+ rbSputnik = new JRadioButton("Sputnik V");
+ ButtonGroup vaccineGroup = new ButtonGroup();
+ vaccineGroup.add(rbCovishield);
+ vaccineGroup.add(rbCovaxin);
+ vaccineGroup.add(rbSputnik);
+ vaccinePanel.add(rbCovishield);
+ vaccinePanel.add(rbCovaxin);
+ vaccinePanel.add(rbSputnik);
+ add(vaccinePanel);
+ add(new JLabel("Time Slot:"));
+ JPanel timePanel = new JPanel();
+ rbMorning = new JRadioButton("Morning");
+ rbAfternoon = new JRadioButton("Afternoon");
+ rbEvening = new JRadioButton("Evening");
+ ButtonGroup timeGroup = new ButtonGroup();
+ timeGroup.add(rbMorning);
+ timeGroup.add(rbAfternoon);
+ timeGroup.add(rbEvening);
+ timePanel.add(rbMorning);
+ timePanel.add(rbAfternoon);
+ timePanel.add(rbEvening);
+ add(timePanel);
+ // Buttons
+ btnAdd = new JButton("ADD");
+ btnUpdate = new JButton("UPDATE");
+ btnDelete = new JButton("DELETE");
+ btnView = new JButton("VIEW");
+ btnSearch = new JButton("SEARCH");
+ add(btnAdd);
+ add(btnUpdate);
+ add(btnDelete);
+ add(btnView);
+ add(btnSearch);
+ // Event Handling for ADD button
+ btnAdd.addActionListener(e -> {
+ try {
+ int birthYear = Integer.parseInt(txtBirthYear.getText());
+ if (birthYear < 1900 || birthYear > 2025) {
+ throw new IllegalArgumentException("Invalid Birth Year!");
+ }
+ JOptionPane.showMessageDialog(this, "Registration Successful!");
+ } catch (NumberFormatException ex) {
+ JOptionPane.showMessageDialog(this, "Birth Year must be a number!");
+ } catch (IllegalArgumentException ex) {
+ JOptionPane.showMessageDialog(this, ex.getMessage());
+ }
+ });
+ setVisible(true);
+ }
+ public static void main(String[] args) {
+ new CoWinRegistration();
+ }
+}
