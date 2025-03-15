@@ -1,0 +1,171 @@
+MobileApp.java (JDBC + Command-Line Menu)
+import java.sql.*;
+import java.util.Scanner;
+public class MobileApp {
+ private static final String DB_URL = "jdbc:mysql://localhost:3306/mobiledb"; // Update DB Name
+ private static final String DB_USER = "root"; // Update Username
+ private static final String DB_PASSWORD = "password"; // Update Password
+ public static void main(String[] args) {
+ if (args.length == 0) {
+ System.out.println("Usage: java MobileApp <operation>");
+ System.out.println("Operations: insert | modify | delete | search | viewall | exit");
+ return;
+ }
+ try (Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+ createMobileTable(con);
+ String operation = args[0].toLowerCase();
+ switch (operation) {
+ case "insert":
+ insertMobile(con);
+ break;
+ case "modify":
+ modifyMobile(con);
+ break;
+ case "delete":
+ deleteMobile(con);
+ break;
+ case "search":
+ searchMobile(con);
+ break;
+ case "viewall":
+ viewAllMobiles(con);
+ break;
+ case "exit":
+ System.out.println("Exiting program...");
+ System.exit(0);
+ break;
+ default:
+ System.out.println("Invalid operation!");
+ }
+ } catch (SQLException e) {
+ e.printStackTrace();
+ }
+ }
+ private static void createMobileTable(Connection con) throws SQLException {
+ String createTableSQL = "CREATE TABLE IF NOT EXISTS MOBILE (" +
+ "Model_Number INT PRIMARY KEY, " +
+ "Model_Name VARCHAR(50), " +
+ "Model_Color VARCHAR(20), " +
+ "Sim_Type VARCHAR(20), " +
+ "NetworkType VARCHAR(20), " +
+ "BatteryCapacity VARCHAR(20), " +
+ "InternalStorage VARCHAR(20), " +
+ "RAM VARCHAR(20), " +
+ "ProcessorType VARCHAR(50))";
+ try (Statement stmt = con.createStatement()) {
+ stmt.executeUpdate(createTableSQL);
+ }
+ }
+ private static void insertMobile(Connection con) throws SQLException {
+ Scanner sc = new Scanner(System.in);
+ System.out.print("Enter Model Number: ");
+ int modelNumber = sc.nextInt();
+ sc.nextLine(); // Consume newline
+ System.out.print("Enter Model Name: ");
+ String modelName = sc.nextLine();
+ System.out.print("Enter Model Color: ");
+ String modelColor = sc.nextLine();
+ System.out.print("Enter Sim Type: ");
+ String simType = sc.nextLine();
+ System.out.print("Enter Network Type: ");
+ String networkType = sc.nextLine();
+ System.out.print("Enter Battery Capacity: ");
+ String batteryCapacity = sc.nextLine();
+ System.out.print("Enter Internal Storage: ");
+ String internalStorage = sc.nextLine();
+ System.out.print("Enter RAM: ");
+ String ram = sc.nextLine();
+ System.out.print("Enter Processor Type: ");
+ String processorType = sc.nextLine();
+ String insertSQL = "INSERT INTO MOBILE VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+ try (PreparedStatement pstmt = con.prepareStatement(insertSQL)) {
+ pstmt.setInt(1, modelNumber);
+ pstmt.setString(2, modelName);
+ pstmt.setString(3, modelColor);
+ pstmt.setString(4, simType);
+ pstmt.setString(5, networkType);
+ pstmt.setString(6, batteryCapacity);
+ pstmt.setString(7, internalStorage);
+ pstmt.setString(8, ram);
+ pstmt.setString(9, processorType);
+ pstmt.executeUpdate();
+ System.out.println("Mobile inserted successfully!");
+ }
+ }
+ private static void modifyMobile(Connection con) throws SQLException {
+ Scanner sc = new Scanner(System.in);
+ System.out.print("Enter Model Number to modify: ");
+ int modelNumber = sc.nextInt();
+ sc.nextLine(); // Consume newline
+ System.out.print("Enter New Model Name: ");
+ String modelName = sc.nextLine();
+ String updateSQL = "UPDATE MOBILE SET Model_Name = ? WHERE Model_Number = ?";
+ try (PreparedStatement pstmt = con.prepareStatement(updateSQL)) {
+ pstmt.setString(1, modelName);
+ pstmt.setInt(2, modelNumber);
+ int rowsUpdated = pstmt.executeUpdate();
+ if (rowsUpdated > 0) {
+ System.out.println("Mobile details updated successfully!");
+ } else {
+ System.out.println("Mobile not found!");
+ }
+ }
+ }
+ private static void deleteMobile(Connection con) throws SQLException {
+ Scanner sc = new Scanner(System.in);
+ System.out.print("Enter Model Number to delete: ");
+ int modelNumber = sc.nextInt();
+ String deleteSQL = "DELETE FROM MOBILE WHERE Model_Number = ?";
+ try (PreparedStatement pstmt = con.prepareStatement(deleteSQL)) {
+ pstmt.setInt(1, modelNumber);
+ int rowsDeleted = pstmt.executeUpdate();
+ if (rowsDeleted > 0) {
+ System.out.println("Mobile deleted successfully!");
+ } else {
+ System.out.println("Mobile not found!");
+ }
+ }
+ }
+ private static void searchMobile(Connection con) throws SQLException {
+ Scanner sc = new Scanner(System.in);
+ System.out.print("Enter Model Number to search: ");
+ int modelNumber = sc.nextInt();
+ String searchSQL = "SELECT * FROM MOBILE WHERE Model_Number = ?";
+ try (PreparedStatement pstmt = con.prepareStatement(searchSQL)) {
+ pstmt.setInt(1, modelNumber);
+ ResultSet rs = pstmt.executeQuery();
+ if (rs.next()) {
+ System.out.println("\nModel Number: " + rs.getInt("Model_Number"));
+ System.out.println("Model Name: " + rs.getString("Model_Name"));
+ System.out.println("Color: " + rs.getString("Model_Color"));
+ System.out.println("Sim Type: " + rs.getString("Sim_Type"));
+ System.out.println("Network Type: " + rs.getString("NetworkType"));
+ System.out.println("Battery Capacity: " + rs.getString("BatteryCapacity"));
+ System.out.println("Internal Storage: " + rs.getString("InternalStorage"));
+ System.out.println("RAM: " + rs.getString("RAM"));
+ System.out.println("Processor Type: " + rs.getString("ProcessorType"));
+ } else {
+ System.out.println("Mobile not found!");
+ }
+ }
+ }
+ private static void viewAllMobiles(Connection con) throws SQLException {
+ String viewSQL = "SELECT * FROM MOBILE";
+ try (Statement stmt = con.createStatement();
+ ResultSet rs = stmt.executeQuery(viewSQL)) {
+ System.out.println("\nMOBILE DETAILS:");
+ System.out.println("---------------------------------------------------------");
+ while (rs.next()) {
+ System.out.println("Model Number: " + rs.getInt("Model_Number") +
+ ", Name: " + rs.getString("Model_Name") +
+ ", Color: " + rs.getString("Model_Color") +
+ ", Sim: " + rs.getString("Sim_Type") +
+ ", Network: " + rs.getString("NetworkType") +
+ ", Battery: " + rs.getString("BatteryCapacity") +
+ ", Storage: " + rs.getString("InternalStorage") +
+ ", RAM: " + rs.getString("RAM") +
+ ", Processor: " + rs.getString("ProcessorType"));
+ }
+ }
+ }
+}
