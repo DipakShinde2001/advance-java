@@ -1,0 +1,49 @@
+RequestInfoServlet.java
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+@WebServlet("/RequestInfoServlet")
+public class RequestInfoServlet extends HttpServlet {
+ protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
+ServletException, IOException {
+ response.setContentType("text/html");
+ PrintWriter out = response.getWriter();
+ // Get Client Information
+ String clientIP = request.getRemoteAddr();
+ String clientBrowser = request.getHeader("User-Agent");
+ // Get Server Information
+ ServletContext context = getServletContext();
+ String serverName = request.getServerName();
+ String serverOS = System.getProperty("os.name");
+ String serverVersion = context.getServerInfo();
+ // Get Loaded Servlets
+ Enumeration<String> servletNames = context.getServletNames();
+ // Generate HTML Response
+ out.println("<html><head><title>Request & Server Info</title></head><body>");
+ out.println("<h2>Client Information</h2>");
+ out.println("<ul>");
+ out.println("<li><strong>Client IP Address:</strong> " + clientIP + "</li>");
+ out.println("<li><strong>Client Browser:</strong> " + clientBrowser + "</li>");
+ out.println("</ul>");
+ out.println("<h2>Server Information</h2>");
+ out.println("<ul>");
+ out.println("<li><strong>Server Name:</strong> " + serverName + "</li>");
+ out.println("<li><strong>Operating System:</strong> " + serverOS + "</li>");
+ out.println("<li><strong>Servlet Container:</strong> " + serverVersion + "</li>");
+ out.println("</ul>");
+ out.println("<h2>Loaded Servlets</h2>");
+ out.println("<ul>");
+ while (servletNames.hasMoreElements()) {
+ out.println("<li>" + servletNames.nextElement() + "</li>");
+ }
+ out.println("</ul>");
+ out.println("</body></html>");
+ }
+}
