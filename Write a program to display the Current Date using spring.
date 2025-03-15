@@ -1,0 +1,31 @@
+CurrentDateController.java
+package com.example.demo.controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+@RestController
+public class CurrentDateController {
+
+ @GetMapping("/currentDate")
+ public String getCurrentDate() {
+ // Get Current Date and Time
+ LocalDateTime now = LocalDateTime.now();
+
+ // Format Date
+ DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+ String formattedDate = now.format(formatter);
+
+ return "<h2>Current Date & Time: " + formattedDate + "</h2>";
+ }
+}
+SpringBootApplication.java
+package com.example.demo;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+@SpringBootApplication
+public class SpringBootApplication {
+ public static void main(String[] args) {
+ SpringApplication.run(SpringBootApplication.class, args);
+ }
+}
