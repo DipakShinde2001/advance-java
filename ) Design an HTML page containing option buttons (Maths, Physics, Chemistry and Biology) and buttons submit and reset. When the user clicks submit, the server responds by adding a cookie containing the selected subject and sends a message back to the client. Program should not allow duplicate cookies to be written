@@ -1,0 +1,67 @@
+SubjectSelectionServlet.java
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+@WebServlet("/SubjectSelectionServlet")
+public class SubjectSelectionServlet extends HttpServlet {
+ protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
+ServletException, IOException {
+ response.setContentType("text/html");
+ PrintWriter out = response.getWriter();
+ // Display Subject Selection Form
+ out.println("<html><head><title>Subject Selection</title></head><body>");
+ out.println("<h2>Select a Subject</h2>");
+ out.println("<form action='SubjectSelectionServlet' method='post'>");
+ out.println("<input type='radio' name='subject' value='Maths' required> Maths<br>");
+ out.println("<input type='radio' name='subject' value='Physics'> Physics<br>");
+ out.println("<input type='radio' name='subject' value='Chemistry'> Chemistry<br>");
+ out.println("<input type='radio' name='subject' value='Biology'> Biology<br><br>");
+ out.println("<input type='submit' value='Submit'>");
+ out.println("<input type='reset' value='Reset'>");
+ out.println("</form>");
+
+ // Display Previously Selected Subject
+ Cookie[] cookies = request.getCookies();
+ if (cookies != null) {
+ for (Cookie cookie : cookies) {
+ if (cookie.getName().equals("selectedSubject")) {
+ out.println("<h3>Previously Selected Subject: " + cookie.getValue() + "</h3>");
+ break;
+ }
+ }
+ }
+ out.println("</body></html>");
+ }
+ protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
+ServletException, IOException {
+ response.setContentType("text/html");
+ PrintWriter out = response.getWriter();
+
+ String selectedSubject = request.getParameter("subject");
+ // Check if Cookie Already Exists
+ boolean cookieExists = false;
+ Cookie[] cookies = request.getCookies();
+ if (cookies != null) {
+ for (Cookie cookie : cookies) {
+ if (cookie.getName().equals("selectedSubject")) {
+ cookieExists = true;
+ break;
+ }
+ }
+ }
+ if (!cookieExists) {
+ // Create and Add Cookie
+ Cookie newCookie = new Cookie("selectedSubject", selectedSubject);
+ newCookie.setMaxAge(60 * 60 * 24); // Cookie lasts 1 day
+ response.addCookie(newCookie);
+ out.println("<h2>Subject Selected: " + selectedSubject + "</h2>");
+ out.println("<h3>Cookie Created Successfully!</h3>");
+ } else {
+ out.println("<h2>Cookie Already Exists! You cannot select another subject.</h2>");
+ }
+ out.println("<br><a href='SubjectSelectionServlet'>Go Back</a>");
+ out.println("</body></html>");
+ }
+}
