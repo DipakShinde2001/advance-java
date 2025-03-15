@@ -1,0 +1,39 @@
+package com.example.springcore;
+public class MessageService {
+ private String message;
+ // Setter for Dependency Injection
+ public void setMessage(String message) {
+ this.message = message;
+ }
+ // Method to Display Message
+ public void showMessage() {
+ System.out.println(message);
+ }
+}
+beans.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans.xsd">
+ <!-- Define MessageService Bean -->
+ <bean id="messageService" class="com.example.springcore.MessageService">
+ <property name="message" value="If you can't explain it simply, you don't understand it well
+enough." />
+ </bean>
+</beans>
+MainApp.java
+package com.example.springcore;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class MainApp {
+ public static void main(String[] args) {
+ // Load Spring Configuration
+ ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+ // Get Bean & Display Message
+ MessageService messageService = (MessageService) context.getBean("messageService");
+ messageService.showMessage();
+ // Close Context
+ ((ClassPathXmlApplicationContext) context).close();
+ }
+}
