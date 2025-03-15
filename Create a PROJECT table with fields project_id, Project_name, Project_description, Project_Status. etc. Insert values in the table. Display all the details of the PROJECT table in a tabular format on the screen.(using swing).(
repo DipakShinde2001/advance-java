@@ -1,0 +1,79 @@
+ProjectTableSwing.java
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.sql.*;
+public class ProjectTableSwing {
+ private static final String DB_URL = "jdbc:mysql://localhost:3306/projectdb"; // Update your DB
+name
+ private static final String DB_USER = "root"; // Update your DB username
+ private static final String DB_PASSWORD = "password"; // Update your DB password
+ public static void main(String[] args) {
+ SwingUtilities.invokeLater(ProjectTableSwing::createAndShowGUI);
+ }
+ private static void createAndShowGUI() {
+ JFrame frame = new JFrame("Project Table Viewer");
+ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ frame.setSize(600, 400);
+ frame.setLayout(new BorderLayout());
+ String[] columnNames = {"Project ID", "Project Name", "Description", "Status"};
+ DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+ JTable table = new JTable(tableModel);
+ JScrollPane scrollPane = new JScrollPane(table);
+
+ frame.add(scrollPane, BorderLayout.CENTER);
+ frame.setVisible(true);
+ // Database Operations
+ try (Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+ createProjectTable(con);
+ insertSampleData(con);
+ loadProjects(con, tableModel);
+ } catch (Exception e) {
+ JOptionPane.showMessageDialog(frame, "Error: " + e.getMessage(), "Database Error",
+JOptionPane.ERROR_MESSAGE);
+ }
+ }
+ private static void createProjectTable(Connection con) throws SQLException {
+ String createTableSQL = "CREATE TABLE IF NOT EXISTS PROJECT (" +
+ "project_id INT AUTO_INCREMENT PRIMARY KEY, " +
+ "project_name VARCHAR(100) NOT NULL, " +
+ "project_description TEXT, " +
+ "project_status VARCHAR(20) NOT NULL)";
+ try (Statement stmt = con.createStatement()) {
+ stmt.executeUpdate(createTableSQL);
+ }
+ }
+ private static void insertSampleData(Connection con) throws SQLException {
+ String insertSQL = "INSERT INTO PROJECT (project_name, project_description, project_status)
+VALUES " +
+ "(?, ?, ?), (?, ?, ?), (?, ?, ?)";
+ try (PreparedStatement pstmt = con.prepareStatement(insertSQL)) {
+ pstmt.setString(1, "AI Chatbot");
+ pstmt.setString(2, "A chatbot using NLP and AI.");
+ pstmt.setString(3, "In Progress");
+ pstmt.setString(4, "E-Commerce Website");
+ pstmt.setString(5, "An online store with payment gateway.");
+ pstmt.setString(6, "Completed");
+ pstmt.setString(7, "Library Management System");
+ pstmt.setString(8, "Software for managing books and users.");
+ pstmt.setString(9, "Pending");
+ pstmt.executeUpdate();
+ }
+ }
+ private static void loadProjects(Connection con, DefaultTableModel tableModel) throws
+SQLException {
+ String selectSQL = "SELECT * FROM PROJECT";
+ try (Statement stmt = con.createStatement();
+ ResultSet rs = stmt.executeQuery(selectSQL)) {
+ while (rs.next()) {
+ Object[] row = {
+ rs.getInt("project_id"),
+ rs.getString("project_name"),
+ rs.getString("project_description"),
+ rs.getString("project_status")
+ };
+ tableModel.addRow(row);
+ }
+ }
+ }
+}
