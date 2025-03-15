@@ -1,0 +1,62 @@
+CustomerSearchServlet.java
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+@WebServlet("/CustomerSearchServlet")
+public class CustomerSearchServlet extends HttpServlet {
+ protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
+ServletException, IOException {
+ response.setContentType("text/html");
+ PrintWriter out = response.getWriter();
+
+ // Display search form
+ out.println("<html><head><title>Customer Search</title></head><body>");
+ out.println("<h2>Search Customer</h2>");
+ out.println("<form action='CustomerSearchServlet' method='post'>");
+ out.println("Enter Customer Number: <input type='text' name='customerNumber' required>");
+ out.println("<input type='submit' value='Search'>");
+ out.println("</form>");
+ out.println("</body></html>");
+ }
+ protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
+ServletException, IOException {
+ response.setContentType("text/html");
+ PrintWriter out = response.getWriter();
+
+ String customerNumber = request.getParameter("customerNumber");
+ try {
+ // Load JDBC Driver
+ Class.forName("com.mysql.cj.jdbc.Driver");
+ // Connect to Database (Update credentials)
+ Connection con =
+DriverManager.getConnection("jdbc:mysql://localhost:3306/yourdatabase", "root", "password");
+ // Query to Search Customer
+ PreparedStatement ps = con.prepareStatement("SELECT * FROM customer WHERE
+customer_number = ?");
+ ps.setString(1, customerNumber);
+ ResultSet rs = ps.executeQuery();
+ // Display Results
+ out.println("<html><head><title>Customer Details</title></head><body>");
+ if (rs.next()) {
+ out.println("<h2>Customer Details</h2>");
+ out.println("<p><b>Customer Number:</b> " + rs.getString("customer_number") + "</p>");
+ out.println("<p><b>Name:</b> " + rs.getString("name") + "</p>");
+ out.println("<p><b>Email:</b> " + rs.getString("email") + "</p>");
+ out.println("<p><b>Phone:</b> " + rs.getString("phone") + "</p>");
+ } else {
+ out.println("<h2 style='color:red;'>Customer Not Found!</h2>");
+ }
+ out.println("<br><a href='CustomerSearchServlet'>Search Again</a>");
+ out.println("</body></html>");
+ con.close();
+ } catch (Exception e) {
+ out.println("<h2 style='color:red;'>Error: " + e.getMessage() + "</h2>");
+ }
+ }
+}
