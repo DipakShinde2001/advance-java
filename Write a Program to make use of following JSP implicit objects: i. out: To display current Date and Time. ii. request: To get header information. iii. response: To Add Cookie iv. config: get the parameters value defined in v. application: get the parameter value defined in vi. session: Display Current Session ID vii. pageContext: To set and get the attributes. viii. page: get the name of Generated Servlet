@@ -1,0 +1,60 @@
+ImplicitObjectsServlet.java
+package com.example;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+public class ImplicitObjectsServlet extends HttpServlet {
+ public void doGet(HttpServletRequest request, HttpServletResponse response) throws
+ServletException, IOException {
+ response.setContentType("text/html");
+ PrintWriter out = response.getWriter();
+ out.println("<html><head><title>Implicit Objects Example</title></head><body>");
+ out.println("<h2>JSP Implicit Objects in Servlet</h2>");
+ // i. Display current Date and Time
+ out.println("<b>Date & Time:</b> " + new SimpleDateFormat("yyyy-MM-dd
+HH:mm:ss").format(new Date()) + "<br>");
+ // ii. Get header information
+ out.println("<b>User-Agent:</b> " + request.getHeader("User-Agent") + "<br>");
+ // iii. Add a Cookie
+ response.addCookie(new Cookie("User", "ServletLearner"));
+ out.println("<b>Cookie Added: User=ServletLearner</b><br>");
+ // iv. Get config parameter
+ ServletConfig config = getServletConfig();
+ out.println("<b>Config Param:</b> " + config.getInitParameter("configParam") + "<br>");
+ // v. Get application parameter
+ ServletContext context = getServletContext();
+ out.println("<b>App Param:</b> " + context.getInitParameter("appParam") + "<br>");
+ // vi. Display Current Session ID
+ out.println("<b>Session ID:</b> " + request.getSession().getId() + "<br>");
+ // vii. Set & Get Attribute (simulating pageContext)
+ request.setAttribute("pageAttr", "Example Attribute");
+ out.println("<b>Page Attr:</b> " + request.getAttribute("pageAttr") + "<br>");
+ // viii. Display Servlet Name
+ out.println("<b>Servlet Name:</b> " + this.getClass().getName() + "<br>");
+ out.println("</body></html>");
+ }
+}
+web.xml
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="3.1">
+ <servlet>
+ <servlet-name>ImplicitServlet</servlet-name>
+ <servlet-class>com.example.ImplicitObjectsServlet</servlet-class>
+ <init-param>
+ <param-name>configParam</param-name>
+ <param-value>Servlet Config Value</param-value>
+ </init-param>
+ </servlet>
+ <servlet-mapping>
+ <servlet-name>ImplicitServlet</servlet-name>
+ <url-pattern>/implicit</url-pattern>
+ </servlet-mapping>
+ <context-param>
+ <param-name>appParam</param-name>
+ <param-value>Application Level Value</param-value>
+ </context-param>
+</web-app>
